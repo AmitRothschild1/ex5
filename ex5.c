@@ -123,7 +123,7 @@ void deletePlaylist(Playlist** playlists, int* playlistsNum ,int deleteIndex)
     printf("Playlist deleted.\n");
 }
 
-char* enterNameInput1()
+char* enterNameInput()
 {
     char *name = NULL;
     int size = 10;
@@ -156,7 +156,7 @@ char* enterNameInput1()
 }
 //
 
-char* enterNameInput()
+char* enterNameInput1()
 {
     char *name;
     char temp[100];
@@ -298,7 +298,7 @@ void sortSongs(Playlist* playlist)
     switch (choice)
     {
         case 1:
-            Song* temp;
+            Song* temp1;
         for (int j = playlist->songsNum-1; j > 0; j--)
         {
             int maxPlace = 0;
@@ -311,14 +311,53 @@ void sortSongs(Playlist* playlist)
                     maxPlace = i;
                 }
             }
-            temp = playlist->songs[j];
+            temp1 = playlist->songs[j];
             playlist->songs[j] = playlist->songs[maxPlace];
-            playlist->songs[maxPlace] = temp;
+            playlist->songs[maxPlace] = temp1;
         }
             break;
         case 2:
+            {
+                //First is less streams
+                Song* temp2;
+                for (int j = playlist->songsNum-1; j > 0; j--)
+                {
+                    int maxPlace = 0;
+                    int maxStreams = -1;
+                    for (int i = 0; i <= j;i++)
+                    {
+                        if (playlist->songs[i]->streams > maxStreams)
+                        {
+                            maxStreams = playlist->songs[i]->streams;
+                            maxPlace = i;
+                        }
+                    }
+                    temp2 = playlist->songs[j];
+                    playlist->songs[j] = playlist->songs[maxPlace];
+                    playlist->songs[maxPlace] = temp2;
+                }
+            }
             break;
         case 3:
+            {
+                Song* temp3;
+                for (int j = 0 ; j < playlist->songsNum; j++)
+                {
+                    int maxPlace = j;
+                    int maxStreams = playlist->songs[j]->streams;
+                    for (int i = j; i < playlist->songsNum ;i++)
+                    {
+                        if (playlist->songs[i]->streams > maxStreams)
+                        {
+                            maxStreams = playlist->songs[i]->streams;
+                            maxPlace = i;
+                        }
+                    }
+                    temp3 = playlist->songs[j];
+                    playlist->songs[j] = playlist->songs[maxPlace];
+                    playlist->songs[maxPlace] = temp3;
+                }
+            }
             break;
         default:
             break;
