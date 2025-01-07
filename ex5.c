@@ -98,8 +98,41 @@ void displayPlaylists(Playlist** playlists, int playlistsNum)
         }
     }
 }
+
+char* enterNameInput()
+{
+    char *name = NULL;
+    int size = 10;
+    int length = 0;
+    char ch;
+    name = (char*)malloc(size * sizeof(char));
+    if (!name)
+    {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+        if (length == size - 1)
+        {
+            size *= 2;
+            char *temp = (char*)realloc(name, size * sizeof(char));
+            if (!temp)
+            {
+                printf("Memory allocation failed!\n");
+                free(name);
+                exit(1);
+            }
+            name = temp;
+        }
+        name[length++] = ch;
+    }
+    name[length] = '\0';
+    return name;
+}
 //
-char* playlistNameInput()
+/*
+char* playlistNameInput1()
 {
     char *name;
     char temp[100];
@@ -113,6 +146,7 @@ char* playlistNameInput()
     strcpy(name, temp);
     return name;
 }
+*/
 /*Songs_Functions=====================================================================================================*/
 Song* createSong(char* title, char* artist, int year, char* lyrics, Playlist* playlist)
 {
@@ -208,7 +242,45 @@ void printPlaylistsMenu()
     printf("\t1. Watch playlists\n\t2. Add playlist\n\t3. Remove playlist\n\t4. exit\n");   
 }
 void sortPlaylist()
+{}
+void sortSongs(Playlist* playlist,int playlistsNum)
 {
+    int choice;
+    scanf("%d",&choice);
+    switch (choice)
+    {
+        case 1:
+            Song** temp = (Song**)malloc(sizeof(Song*)*playlist->songsNum);
+        if (!temp)
+        {
+            printf("Failed to allocate memory for playlists\n");
+            exit(0);
+        }
+        for (int j = 0; j < playlistsNum; j++)
+        {
+            int place = 0;
+            int newestYear = 0;
+            for (int i = 0; i < playlist->songsNum; i++)
+            {
+                if (playlist->songs[i] != NULL && playlist->songs[i]->year > newestYear)
+                {
+                    newestYear = playlist->songs[i]->year;
+                    place = i;
+                }
+            }
+            temp[playlist->songsNum -(j+1)] = playlist->songs[place];
+            playlist->songs[place]=NULL;
+        }
+        free(playlist->songs);
+        playlist->songs = temp;
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        default:
+            break;
+    }
     printf("sorted\n");
 }
 /*Main_Functions======================================================================================================*/
@@ -218,13 +290,13 @@ void addSongToPlaylist(Playlist** playlists)
     int year;
     printf("Enter song's details:\n");
     printf("Title:\n");
-    title = playlistNameInput();
+    title = enterNameInput();
     printf("Artist:\n");
-    artist = playlistNameInput();
+    artist = enterNameInput();
     printf("Year:\n");
     scanf("%d", &year);
     printf("Lyrics:\n");
-    lyrics = playlistNameInput();
+    lyrics = enterNameInput();
     addSong(*playlists,title,artist,year,lyrics);
 }
 
@@ -245,11 +317,12 @@ int main()
         {
         case 1:
             displayPlaylists(playlists, playlistsNum);
+            int playlistChoice;
+            scanf("%d", &playlistChoice);
+            printf("playlist %s:\n",playlists[playlistChoice-1]->name);
             int case1Choice = 0;
-            scanf("%d", &case1Choice);
             while (case1Choice!=6)
             {
-                printf("playlist %s:\n",playlists[case1Choice-1]->name);
                 printf("\t1. Show Playlist\n\t2. Add Song\n\t3. Delete Song\n\t4. Sort\n\t5. Play\n\t6. exit\n");
                 scanf("%d", &case1Choice);
                 switch (case1Choice)
@@ -275,6 +348,10 @@ int main()
                         case 3:
                             break;
                         case 4:
+                            printf("choose:\n");
+                    printf("1. sort by year\n2. sort by streams - ascending order\n");
+                    printf("3. sort by streams - descending order\n4. sort alphabetically\n");
+                    sortSongs(playlists[playlistChoice-1],playlistsNum);
                             break;
                         case 5:
                             {
@@ -293,7 +370,7 @@ int main()
             //
         case 2:
             printf("Enter playlist's name:\n");
-            char *input = playlistNameInput();
+            char *input = enterNameInput();
             addPlaylist(&playlists, &playlistsNum, input);
             free(input);
             break;
